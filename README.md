@@ -1,14 +1,3 @@
----
-title: "Intro to R for Cancer Immunotherapy Research"
-author: "Phil Cheng Sabrina Hogan Patrick Turko"
-date: "`r doc_date()`"
-output: BiocStyle::html_document
-vignette: >
-  %\VignetteIndexEntry{TCGAbrowser workflow}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
 # Introduction
 Cancer immunotherapy research is quite diverse and large datasets of clinical parameters such as hematological values, response and survival are being collected by the hospital. We can explore the data using [R](https://www.r-project.org/) and perform some simple statistical tests to look predicitive and prognostic markers. 
 
