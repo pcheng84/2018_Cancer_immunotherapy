@@ -1,0 +1,29 @@
+---
+title: "Intro to R for Cancer Immunotherapy Research"
+author: "Phil Cheng Sabrina Hogan Patrick Turko"
+date: "`r doc_date()`"
+package: "`r pkg_ver('TCGAbrowser')`"
+output: BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{TCGAbrowser workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+Cancer immunotherapy research is quite diverse and large datasets of clinical parameters such as hematological values, response and survival are being collected by the hospital. We can explore the data using R and perform some simple statistical tests to look predicitive and prognostic markers. 
+
+# 
+
+# Installation
+To install TCGAbrowser use the code below.
+```{r, message = FALSE, warning = FALSE}
+require(devtools)
+devtools::install_github("pcheng84/TCGAbrowser")
+require(TCGAbrowser)
+```
+
+The workflow for TCGAbrowser is shown in the graphic below.
+
+```{r, out.width = "50%", echo = FALSE}
+knitr::include_graphics("workflow.png")
