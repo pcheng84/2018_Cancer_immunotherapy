@@ -41,10 +41,17 @@ install.packages(c("tidyverse"))
 ```
 
 # Getting started with R studio
-![alt text](RStudio_Layout.png)
+![](RStudio_Layout.png)
+    1. To write your script (will stay visible), record what you did and why (comments)  
+    2. Where R runs the commands one after the other (will not be saved)  
+    3. Where you can see what’s stored in the memory  
 
 
 
 
+# Cheat sheets
+
+- dplyr [(download pdf)](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
+- ggplot2 [(download pdf)](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
 
 
