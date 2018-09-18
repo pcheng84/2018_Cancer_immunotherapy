@@ -47,6 +47,46 @@ install.packages(c("tidyverse"))
     3. Where you can see what’s stored in the memory  
 
 
+# Syntax  
+
+## Assigning variables  
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+x <- 1  # assign "1" to the variable "x"
+y <- 2  # assign "2" to the variable "y"
+```
+Now we want R to give us the sum of x+y  
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+x+y
+```
+The output shows you how many results there are (here [1]) and will give you the result (3)
+
+##Importing datasets  
+Use the "Import Dataset" button in the "Workspace and history" panel  
+![](ImportDataset1.png)  
+select "From Text (base)..."  
+![](ImportDataset2.png){ height=30% width=30% }  
+Make sure the Data Frame (bottom right box) shows well separated columns  
+If it is not the case you will have to change the settings, such as which separator to use, does your table have headings, what notation is used to mark the missing values (standard would be NA but your table may contain "?" or any other string)  
+![](ImportDataset3.png){ height=40% width=40% }    
+
+
+# Operators  
+
+| Symbol | Meaning                  | 
+| -------|--------------------------| 
+| **<**  | Less than                |  
+| **<=** | Less than or equal to    |  
+| **>**  | Greater than             |  
+| **>=** | Greater than or equal to |  
+| **==** | Equal to                 |  
+| **!=** | Not equal to             |  
+| **!a** | Not a                    |  
+|**a\|b**| a or b                   |  
+|**a&b** | a and b                  |  
+  
+</br>
+Examples of grouping:
+![](groups.png){ height=60% width=60% }  
 
 
 # Cheat sheets
