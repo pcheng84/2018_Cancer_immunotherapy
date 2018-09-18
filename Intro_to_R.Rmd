@@ -47,7 +47,7 @@ This is what RStudio looks like
 ## Start your script
 
 ### Name your script 
-Start your script by giving it a name and briefly commenting on what you intend to do  
+Start your script by giving it a name and briefly commenting on what you intend to do.  
 The "#" allows you to comment your script, R will not consider what is written on the line after the #.  
 ```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = FALSE}
 ##############################
@@ -71,7 +71,9 @@ R comes with some default packages for statistics and plotting but we will use f
 inside we will use the install.packages function  
 
 The concept of installing packages and loading libraries can be viewed as apps on a smartphone.  
-- To be able to use a new app on your phone, you first need to download it, in R you install the package. Once it has been installed in your session it will stay there, you do not have to install it again the next time you use R.   
+
+- To be able to use a new app on your phone, you first need to download it, in R you install the package. Once it has been installed in your session it will stay there, you do not have to install it again the next time you use R.  
+
 - To then use this app you need to open it, in R you load the library. You need to load the libraries you will need everytime you start a new script.  
 
 ```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = FALSE}
@@ -80,27 +82,68 @@ install.packages("tidyverse")
 install.packages("reshape2")
 install.packages("ggplot2")
 
-install.packages(c("tidyverse", "reshape2", "ggplot2"))   # you can also load them all together like this
+# you can also load them all together like this
+install.packages(c("tidyverse", "reshape2", "ggplot2"))   
 
 # Loading the libraries we will use today
 
 library(tidyverse) # note that here there is no " "
 library(reshape2)
+
 ```
 
 
 # R Syntax  
+## R objects
+R has five different classes of objects:  
+
+Class     |Exemple            | Create a vector           |
+----------|------------       |---------------------------| 
+character |a, bc, def         |a <- c("a", "bc", "def")   |
+numeric   |1.7, -1.7, 12, -12 |b <- c(1.7, -1.7, 12, -12) |
+integer   |1, -1, 33, -33     |c <- c(1, -1, 33, -33)     |
+logical   |TRUE, FALSE        |d <- c(TRUE, TRUE, FALSE)  |
+factor    |green, blue, red   |e <- factor(c("green", "blue", "red", "red"))   |
+
+The most basic object is a vector.
+A vector can only contain objects from the same class. 
+There is one exception which is the *list*. It can contain objects of different classes.
 
 ## Assigning variables  
+Choose a variable and use the assignment character (<-) to assign it a value. Here we will assign the number 2 to the variable x.  
+To visualise the variable, just type the name of the variable and press "Ctrl"+"Enter" (in the script) or just "Enter" (in the console).  
 ```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
-x <- 1  # assign "1" to the variable "x"
-y <- 2  # assign "2" to the variable "y"
+x <- 2  # assign "2" to the variable "x"
+x
 ```
-Now we want R to give us the sum of x+y  
+The output shows you how many results there are (here [1]) and will give you value of the result(s).
+
+You can now assign another number to a second variable and make the sum of both.    
 ```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+y <- 3  # assign "3" to the variable "y"
+
 x+y
 ```
-The output shows you how many results there are (here [1]) and will give you the result (3)
+
+The result of a calculation can also be stored as a new variable
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+z <- x+y+x*y
+z
+```
+
+The variable can also be a vector (sequence).  
+
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+my.vector1 <- c(1,2,3,4,5)
+
+#this is another way of creating the same vector using the seq() function
+my.vector2 <- seq(from=1, to=5, by=1)  
+
+?seq  # run this command to get more information on the function and see how it is used
+
+```
+
+
 
 
 ## Operators  
@@ -147,6 +190,7 @@ Here are a few commands that can help you assess the shape of your dataset:
 ```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = FALSE}
 str(MyData)
 glimpse(MyData)
+tbl_df()
 head(MyData)
 tail(MyData)
 ```
