@@ -1,6 +1,6 @@
 ---
 title: "Intro to R for Cancer Immunotherapy Research"
-author: "Phil Cheng Sabrina Hogan Patrick Turko"
+author: "Phil Cheng, Sabrina Hogan, Patrick Turko"
 date: "`r doc_date()`"
 output: BiocStyle::html_document
 vignette: >
@@ -30,24 +30,66 @@ Cancer immunotherapy research is quite diverse and large datasets of clinical pa
 
 
 # Installation
-To install R download it from [https://www.r-project.org/](https://www.r-project.org/)
+To install R download it from [https://www.r-project.org/](https://www.r-project.org/)  
 To install Rstudio download it from [https://www.rstudio.com/](https://www.rstudio.com/)
 
-# Installing packages
-R comes with some default packages for statistics and plotting but we will use fancier libraries for our analysis
-inside we will use the install.packages function
-```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = FALSE}
-install.packages(c("tidyverse"))
-```
 
 # Getting started with R studio
+
+## Layout
+This is what RStudio looks like  
+
 ![](RStudio_Layout.png)  
     1. To write your script (will stay visible), record what you did and why (comments)  
     2. Where R runs the commands one after the other (will not be saved)  
     3. Where you can see what’s stored in the memory  
 
+## Start your script
 
-# Syntax  
+### Name your script 
+Start your script by giving it a name and briefly commenting on what you intend to do  
+The "#" allows you to comment your script, R will not consider what is written on the line after the #.  
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = FALSE}
+##############################
+# This is my first R script #
+#############################
+
+# Introduction to R
+# ....
+```
+
+### Clear memory  
+In order to make sure no variables are already assigned it is important to clear R's brain before starting a new project.  
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = FALSE}
+
+rm(list = ls())    # this command clears R memory
+
+```
+
+### Install packages / Load libraries  
+R comes with some default packages for statistics and plotting but we will use fancier libraries for our analysis
+inside we will use the install.packages function  
+
+The concept of installing packages and loading libraries can be viewed as apps on a smartphone.  
+- To be able to use a new app on your phone, you first need to download it, in R you install the package. Once it has been installed in your session it will stay there, you do not have to install it again the next time you use R.   
+- To then use this app you need to open it, in R you load the library. You need to load the libraries you will need everytime you start a new script.  
+
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = FALSE}
+# Installing all the packages we will need 
+install.packages("tidyverse")
+install.packages("reshape2")
+install.packages("ggplot2")
+
+install.packages(c("tidyverse", "reshape2", "ggplot2"))   # you can also load them all together like this
+
+# Loading the libraries we will use today
+
+library(tidyverse) # note that here there is no " "
+library(reshape2)
+```
+
+
+# R Syntax  
 
 ## Assigning variables  
 ```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
@@ -60,7 +102,30 @@ x+y
 ```
 The output shows you how many results there are (here [1]) and will give you the result (3)
 
-##Importing datasets  
+
+## Operators  
+
+| Symbol | Meaning              | 
+| -------|----------------------| 
+| <  | Less than                |  
+| <= | Less than or equal to    |  
+| >  | Greater than             |  
+| >= | Greater than or equal to |  
+| == | Equal to                 |  
+| != | Not equal to             |  
+| !a | Not a                    |  
+|a\|b| a or b                   |  
+|a&b | a and b                  |  
+  
+</br>
+Examples of grouping:
+![](groups.png){ height=60% width=60% }  
+
+
+
+#Importing and exploring datasets  
+
+## Easy way to import dataset
 Use the "Import Dataset" button in the "Workspace and history" panel  
 ![](ImportDataset1.png)  
 select "From Text (base)..."  
@@ -69,25 +134,27 @@ Make sure the Data Frame (bottom right box) shows well separated columns
 If it is not the case you will have to change the settings, such as which separator to use, does your table have headings, what notation is used to mark the missing values (standard would be NA but your table may contain "?" or any other string)  
 ![](ImportDataset3.png){ height=40% width=40% }    
 
+The correct command to import your dataset will then appear in the "Console".  
+You can copy it and paste it in your "Script".  
 
-# Operators  
+Once you get more used to the R language you can also directly type the comand to import your dataset from your script.  
+Note: once you start typing the path to the folder (i.e. "/data/Sabrina/..."), after the "/" you can press the tab key to visualise files and folders in this directory.  
 
-| Symbol | Meaning                  | 
-| -------|--------------------------| 
-| **<**  | Less than                |  
-| **<=** | Less than or equal to    |  
-| **>**  | Greater than             |  
-| **>=** | Greater than or equal to |  
-| **==** | Equal to                 |  
-| **!=** | Not equal to             |  
-| **!a** | Not a                    |  
-|**a\|b**| a or b                   |  
-|**a&b** | a and b                  |  
-  
-</br>
-Examples of grouping:
-![](groups.png){ height=60% width=60% }  
+## Visualising your dataset
+It is very important to make sure your data has been correclty imported.  
+However, sometimes the table can be huge. 
+Here are a few commands that can help you assess the shape of your dataset:  
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = FALSE}
+str(MyData)
+glimpse(MyData)
+head(MyData)
+tail(MyData)
+```
 
+
+
+
+# Piping
 
 # Cheat sheets
 
