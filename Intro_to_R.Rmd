@@ -10,7 +10,7 @@ vignette: >
 ---
 
 # Introduction
-Cancer immunotherapy research is quite diverse and large datasets of clinical parameters such as hematological values, response and survival are being collected by the hospital. We can explore the data using [R](https://www.r-project.org/) and perform some simple statistical tests to look predicitive and prognostic markers. 
+Cancer immunotherapy research is quite diverse, ranging from *in vitro* methods to *in silico* analysis of large clinical datasets. Clinical datasets usually include response and survival with a number of parameters that are measured from the patient eg. blood values. To be able to explore the data, we will use [R](https://www.r-project.org/) to perform some simple statistical tests to look predicitive and prognostic markers. 
 
 # What is R
 - Free statistical language
@@ -48,7 +48,7 @@ This is what RStudio looks like
 
 ### Name your script 
 Start your script by giving it a name and briefly commenting on what you intend to do.  
-The "#" allows you to comment your script, R will not consider what is written on the line after the #.  
+The **#** allows you to comment your script, R will not consider what is written on the line after the **#**.  
 ```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = FALSE}
 ##############################
 # This is my first R script #
@@ -67,11 +67,10 @@ rm(list = ls())    # this command clears R memory
 ```
 
 ### Install packages / Load libraries  
-R comes with some default packages for statistics and plotting but we will use fancier libraries for our analysis
-inside we will use the install.packages function  
+R comes with some default packages for statistics and plotting but we will use fancier libraries for our analysis.
+We will use the `install.packages()` function to add new libraries to our R installation.
 
-The concept of installing packages and loading libraries can be viewed as apps on a smartphone.  
-
+The concept of installing packages and loading libraries for R are like apps on a smartphone.  
 - To be able to use a new app on your phone, you first need to download it, in R you install the package. Once it has been installed in your session it will stay there, you do not have to install it again the next time you use R.  
 
 - To then use this app you need to open it, in R you load the library. You need to load the libraries you will need everytime you start a new script.  
@@ -111,7 +110,7 @@ A vector can only contain objects from the same class.
 There is one exception which is the *list*. It can contain objects of different classes.
 
 ## Assigning variables  
-Choose a variable and use the assignment character (<-) to assign it a value. Here we will assign the number 2 to the variable x.  
+Choose a variable and use the assignment character `<-` to assign it a value. Here we will assign the number 2 to the variable x.  
 To visualise the variable, just type the name of the variable and press "Ctrl"+"Enter" (in the script) or just "Enter" (in the console).  
 ```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
 x <- 2  # assign "2" to the variable "x"
@@ -185,37 +184,71 @@ Once you get more used to the R language you can also directly type the comand t
 Note: once you start typing the path to the folder (i.e. "/data/Sabrina/..."), after the "/" you can press the tab key to visualise files and folders in this directory.  
 
 ## Import table with code
-We have a table with some clinical data. It is a tab-delimited table we set `sep = "\t"`. We also know the first line of the table are the names of the column so we set `header = TRUE`.
+We have two tables with some clinical data, one with the clinical characteristics like stage, sex and age of the patient, and the other the treatment information. Both are tab-delimited tables, so we will use the `read.table()` function to import it. We have to tell R how the table is delimited, in this case its by tab so we set `sep = "\t"`. We also know the first line of the table are the names of the column so we set `header = TRUE`. This will import the table into R as a `data.frame`. This is a specific object in R that holds data in a rectangular format, where the data is organized by rows and columns.
+
 ```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
-MyData <- read.table("Derm_patients.txt", sep = "\t", header = TRUE)
+patients <- read.table("Derm_patients.txt", sep = "\t", header = TRUE)
+treatment <- read.table("Derm_treatments.txt", sep = "\t", header = TRUE)
 ```
 
 ## Inspecting your dataset
 It is very important to make sure your data has been correctly imported.  
 However, sometimes the table can be huge. 
 Here are a few commands that can help you assess the shape of your dataset:  
-```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = FALSE}
 #number of rows in the table
-nrow(MyData)
+nrow(patients)
+nrow(treatment)
 
 #number of columns in the table
-ncol(MyData)
+ncol(patients)
+ncol(treatment)
 
 #structure of the table
-str(MyData)
+str(patients)
+str(treatment)
 
-#get the first 4 rows of the table
-head(MyData)
-
-#get the last 4 rows of the table
-tail(MyData)
+#get the first 6 rows of the table
+head(patients)
+head(treatment)
+#get the last 6 rows of the table
+tail(patient)
+tail(treatment)
 ```
 
+You notice that the patient and treatment table are different sizes, that's because not all patients receive systemic treatment. Many of the patients we see in the clinic are early stage melanomas which are removed with surgery. So what we will do next is extract the metastatic patients from the patient table and use these to find the first systemic they received from the treatment table.
 
+# Looking into the data frame
+Now that we have the table as a `data.frame` we can access all the data by rows and columns. We can use square brackets `[]` to look inside the patients `data.frame`. 
 
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = FALSE}
+#to look at the first row of the data frame
+patients[1,]
+
+#to look at the first column of the data frame
+patients[, 1]
+
+#to get the data from the second row third column of the data frame
+patients[2,3]
+
+#a nice convenience with the data frame is we can use the column names to subset instead of a number
+#we can use the colnames() function to get the column names of the data frame
+colnames(patients)
+
+patients[, "PAT_ID"]
+patients[, c("PAT_ID", "HUICC")]
+
+#we could techincally do the same with rows, but by default read.table just names the rows in numeric ascending order. You would need to assign the names for the rows first.
+head(rownames(patients))
+```
 
 # Piping
+Regular R syntax is quite cumbersome and Hadley Wickman developed the `tidyverse` suite of libraries to make it easier to manipulate data in R. We will use this special function called the pipe `%>%`. This allows the code to flow from left to right so it is more readable. We will show you an example of how we subset the table with regular R and then using `dplyr`. The staging information is located in the **HUICC** column and the **PAT_ID** column is how we will match the patients from the clinical table to the treatment table. We will extract all *Stage IV* patients, then find out what systemic treatment they received first.
 
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = false}
+#subset patient table for Stage IV and assign it to a variable for easy access
+patient_iv <- patients[patients$HUICC == "IV", ]
+```
 # Cheat sheets
 
 - dplyr [(download pdf)](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
