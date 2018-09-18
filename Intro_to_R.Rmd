@@ -4,7 +4,7 @@ author: "Phil Cheng, Sabrina Hogan, Patrick Turko"
 date: "`r doc_date()`"
 output: BiocStyle::html_document
 vignette: >
-  %\VignetteIndexEntry{TCGAbrowser workflow}
+  %\VignetteIndexEntry{Intro to R}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -84,7 +84,8 @@ install.packages("ggplot2")
 
 # you can also load them all together like this
 install.packages(c("tidyverse", "reshape2", "ggplot2"))   
-
+```
+```{r, eval = TRUE, echo = TRUE}
 # Loading the libraries we will use today
 
 library(tidyverse) # note that here there is no " "
@@ -183,15 +184,30 @@ You can copy it and paste it in your "Script".
 Once you get more used to the R language you can also directly type the comand to import your dataset from your script.  
 Note: once you start typing the path to the folder (i.e. "/data/Sabrina/..."), after the "/" you can press the tab key to visualise files and folders in this directory.  
 
-## Visualising your dataset
-It is very important to make sure your data has been correclty imported.  
+## Import table with code
+We have a table with some clinical data. It is a tab-delimited table we set `sep = "\t"`. We also know the first line of the table are the names of the column so we set `header = TRUE`.
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+MyData <- read.table("Derm_patients.txt", sep = "\t", header = TRUE)
+```
+
+## Inspecting your dataset
+It is very important to make sure your data has been correctly imported.  
 However, sometimes the table can be huge. 
 Here are a few commands that can help you assess the shape of your dataset:  
-```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = FALSE}
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+#number of rows in the table
+nrow(MyData)
+
+#number of columns in the table
+ncol(MyData)
+
+#structure of the table
 str(MyData)
-glimpse(MyData)
-tbl_df()
+
+#get the first 4 rows of the table
 head(MyData)
+
+#get the last 4 rows of the table
 tail(MyData)
 ```
 
