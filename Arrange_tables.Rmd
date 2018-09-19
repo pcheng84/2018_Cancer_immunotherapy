@@ -11,10 +11,58 @@ vignette: >
 
 # Real life situation
 I recently got asked to create a cohort of patients and collect samples from the biobank.  
+
 Here are the selection criteria:  
 
 - FFPE blocks
 - in a window of 90days prior or after treatment initiation
+- treatment of interest : immunotherapies
 
 
-I had access to 
+I had access to 2 tables different tables:  
+
+- one containing the treatment information for some patients of interest
+- one containing the sample information for all the patients of dermatology
+
+
+
+
+# Explore the datasets
+
+## Start your script
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+rm(list=ls())
+
+library(tidyverse)
+library(lubridate)
+```
+
+
+## Import the datasets
+
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+samples <- read.delim("/data/Sabrina/2018_Cancer_immunotherapy/data/Sabrina_all_samples.txt", comment.char="#", na.strings = c("NA"," ",""))
+treatments <- read.delim("/data/Sabrina/2018_Cancer_immunotherapy/data/Sabrina_treatments_table.txt", comment.char="#", na.strings = c("NA"," ",""))
+
+
+tbl_df(samples)
+str(samples)
+
+tbl_df(treatments)
+str(treatments)
+
+```
+
+some columns have weird names. Let's change this
+
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+# rename some columns
+samples <- samples %>%
+  rename(sampling.date=DBDEINDAT)%>%
+  rename(diagnostic1=DBCDIAGNOSE)%>%
+  rename(diagnostic2=DiagnoseExtractedFromDBBBLOB)
+```
+
+
+calculate treatment duration
+
