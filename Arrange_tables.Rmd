@@ -1,0 +1,20 @@
+---
+title: "Arrange Tables"
+author: "Sabrina Hogan"
+date: "`r doc_date()`"
+output: BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{Intro to R}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Real life situation
+I recently got asked to create a cohort of patients and collect samples from the biobank.  
+Here are the selection criteria:  
+
+- FFPE blocks
+- in a window of 90days prior or after treatment initiation
+
+
+I had access to 
