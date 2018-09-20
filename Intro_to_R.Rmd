@@ -367,9 +367,11 @@ pt <- merge(patients, treatment2, by = "PAT_ID", all.x = TRUE)
 
 pt4 <- pt[pt$HUICC == "IV", ]
 
-pt1 <- treatment2 %>%
-  left_join(patients, treatment2, by="PAT_ID") %>%
+
+pt <- patients %>%
   filter(HUICC == "IV")
+pt4 <- left_join(pt, treatment2, by="PAT_ID")
+ 
 
 #we can see the number of treatments in the PRO_BEZ column
 table(pt4$PRO_BEZ)
