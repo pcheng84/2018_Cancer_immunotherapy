@@ -25,12 +25,10 @@ I had access to 2 tables different tables:
 - one containing the sample information for all the patients of dermatology
 
 
-
-
 # Explore the datasets
 
 ## Start your script
-```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+```{r, message = FALSE, warning = FALSE, echo = TRUE, eval = TRUE}
 rm(list=ls())
 
 library(tidyverse)
@@ -40,7 +38,7 @@ library(lubridate)
 
 ## Import the datasets
 
-```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+```{r, message = FALSE, warning = FALSE, echo = TRUE, eval = TRUE}
 samples <- read.delim("/data/Sabrina/2018_Cancer_immunotherapy/data/Sabrina_all_samples.txt", comment.char="#", na.strings = c("NA"," ",""))
 treatments <- read.delim("/data/Sabrina/2018_Cancer_immunotherapy/data/Sabrina_treatments_table.txt", comment.char="#", na.strings = c("NA"," ",""))
 
@@ -53,7 +51,14 @@ str(treatments)
 
 ```
 
-some columns have weird names. Let's change this
+
+## Rename
+Some columns have weird names. Let's change this.  
+Rename as follow:
+
+- DBDEINDAT --> sampling.date
+- DBCDIAGNOSE  --> diagnostic1
+- DiagnoseExtractedFromDBBBLOB --> diagnostic2
 
 ```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
 # rename some columns
@@ -63,6 +68,60 @@ samples <- samples %>%
   rename(diagnostic2=DiagnoseExtractedFromDBBBLOB)
 ```
 
+# Arrange tables
 
-calculate treatment duration
+## treatment table
+
+The treatment table contains information for a lot of different treatments.  
+We need to select for immunotherapies only (aCLTA4, aPD1, aCTLA4_aPD1)
+
+
+
+## samples table
+
+The sample table contains some empty rows which are obviously useless.  
+Remove the rows which do not contain any information.
+
+
+The sample table has multiple colums containing sampleID information.  
+The usual nomenclature for our samples contains information about the type of sample, the year and the sample number, all together.
+
+You need to combine  "sample.kind", "sample.year" and "sample.num" as follow:  
+
+--> H12.345
+
+
+
+Make sure there is no space between the characters...
+
+
+
+# Select the right samples
+Now that the nomenclature is correct, let's have a look at the different type of samples present.  
+The table contains many sample types (HG=blood, M=mutation analysis etc...).  
+
+Filter out the samples that are not parafin blocks (remove HG, M, Z, G, SP, TU, K)  
+
+
+# Merge treatment and sample table
+
+
+
+# Select the samples in the correct period
+subset the table in order to only keep the samples that have been collected between 90d before and 90d after treatment start.  
+
+
+
+
+# Plot your results
+
+
+
+what is wrong in the plot?  
+
+
+
+now that your results look good, save your table.  
+
+plot responders only and add a title containing the number of R and NR in the entire cohort  
 
