@@ -85,9 +85,9 @@ you should have:
 you can use table() to explore the treatment colum.  
 
 
-How do you solve this problem?
+How do you solve this problem?  
 
-good. Now we can select our patients again.
+good. Now we can select our patients again.  
 
 
 *note: all the levels are still there even if we do not have any samples for those therapy anymore. It can sometimes also appear in your plot legend. This is how you would relevel the treatment column:*
