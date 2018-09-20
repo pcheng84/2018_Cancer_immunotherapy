@@ -356,6 +356,7 @@ table(duplicated(treatment.order$PAT_ID))
 
 #now we will remove all the duplicates
 treatment2 <- treatment.order[!duplicated(treatment$PAT_ID),]
+table(duplicated(treatment2$PAT_ID))
 
 treatment3 <- treatment %>%
   mutate(Date_start=dmy(treatment$BEGINN))%>%
