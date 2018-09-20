@@ -321,6 +321,7 @@ table(duplicated(treatment.order$PAT_ID))
 
 #now we will remove all the duplicates
 treatment2 <- treatment.order[!duplicated(treatment$PAT_ID),]
+table(duplicated(treatment2$PAT_ID))
 
 #now that our treatment table just has one treatment per patient, we can merge it to the patient table
 pt <- merge(patients, treatment2, by = "PAT_ID", all.x = TRUE)
