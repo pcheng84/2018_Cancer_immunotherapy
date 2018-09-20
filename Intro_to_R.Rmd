@@ -1,6 +1,6 @@
 ---
 title: "Intro to R for Cancer Immunotherapy Research"
-author: "Phil Cheng, Sabrina Hogan, Patrick Turko"
+author: "Phil Cheng"
 date: "`r doc_date()`"
 output: BiocStyle::html_document
 vignette: >
@@ -290,12 +290,49 @@ In our table we are only interested in the melanomas which are class C43
 The HIST column is the International Classification of Diseases for Oncology coding [ICD-O-3](http://codes.iarc.fr/) The 87xx series will identify the subtype of melanoma
 
 #Some exercises
-We would like to create a summary table for all melanomas (C43) sorted by subtype: Superficial spreading, nodular, lentigo maligna, and malignant melanoma NOS (not otherwise specified). We want to know the average age, male and female distribution, and average breslow depth if available.
+We would like to create a summary table for all melanomas (C43) sorted by subtype: Superficial spreading, nodular, lentigo maligna, and malignant melanoma NOS (not otherwise specified). We want to know the average age, male and female distribution, and average breslow depth if available. **hint** you can use `grep()` capture all C43.X patients
 
 ```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = false}
 
 ```
 
+#Merging tables
+
+We can also now use Stage IV melanoma patients and find out what systemic treatment they received first.
+The function `merge()` will allow us to combine two tables based on a single common column. In our case, we will use the **PAT_ID** column. First we will remove all the duplicates from the treatment table by filtering with the function `duplicated`. 
+
+```{r}
+#duplicated will return a TRUE/FALSE vector. It will mark the first instance of a variable with FALSE and afterwards any repeat will be marked with TRUE
+#This shows how many duplicates there are in the treatment table
+table(duplicated(treatment$PAT_ID))
+
+#since we don't know how the dates of the treatment are sorted we will sort from earliest to latest
+#we will convert the BEGINN column with as.Date() to a Date class for sorting
+
+treatment$Date_start <- as.Date(treatment$BEGINN, "%d.%m.%Y")
+class(treatment$BEGINN)
+class(treatment$Date_start)
+
+#using order() we can create an index vector to order the rows from earliest date to latest date
+treatment.order <- treatment[order(treatment$Date_start),]
+
+#we can see there is still the same amount of duplicates in our new sorted table
+table(duplicated(treatment.order$PAT_ID))
+
+#now we will remove all the duplicates
+treatment2 <- treatment.order[!duplicated(treatment$PAT_ID),]
+
+#now that our treatment table just has one treatment per patient, we can merge it to the patient table
+pt <- merge(patients, treatment2, by = "PAT_ID", all.x = TRUE)
+
+pt4 <- pt[pt$HUICC == "IV", ]
+
+#we can see the number of treatments in the PRO_BEZ column
+table(pt4$PRO_BEZ)
+```
+
+#Exercise
+Create a summary table with the Stage IV melanoma patients for Sex, Age, and Treatment
 # Cheat sheets
 
 - dplyr [(download pdf)](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
