@@ -76,6 +76,23 @@ The treatment table contains information for a lot of different treatments.
 We need to select for immunotherapies only (aCLTA4, aPD1, aCTLA4_aPD1)
 
 
+you should have:  
+
+111 aCTLA4  
+71 aCTLA4_aPD1  
+195 aPD1   
+
+you can use table() to explore the treatment colum.  
+
+
+How do you solve this problem?
+
+good. Now we can select our patients again.
+
+
+*note: all the levels are still there even if we do not have any samples for those therapy anymore. It can sometimes also appear in your plot legend. This is how you would relevel the treatment column:*
+
+
 
 ## samples table
 
@@ -105,6 +122,7 @@ Filter out the samples that are not parafin blocks (remove HG, M, Z, G, SP, TU, 
 
 # Merge treatment and sample table
 
+in order to plot the results we need all the information in the same table
 
 
 # Select the samples in the correct period
