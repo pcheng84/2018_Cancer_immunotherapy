@@ -246,7 +246,7 @@ head(rownames(patients))
 ```
 
 # Subsetting and summarizing
-Regular R syntax is quite cumbersome and Hadley Wickman developed the `tidyverse` suite of libraries to make it easier to manipulate data in R. We will use this special function called the pipe `%>%`. This allows the code to flow from left to right so it is more readable. We will show you an example of how we subset the table with regular R and then using `dplyr`. The staging information is located in the **HUICC** column and the **PAT_ID** column is how we will match the patients from the clinical table to the treatment table. We will extract all *Stage IV* patients, then find out what systemic treatment they received first.
+Regular R syntax is quite cumbersome and Hadley Wickman developed the `tidyverse` suite of libraries to make it easier to manipulate data in R. We will use this special function called the pipe `%>%` later. This allows the code to flow from left to right so it is more readable. We will show you an example of how we subset the table with regular R and then using `dplyr`. The staging information is located in the **HUICC** column and the **PAT_ID** column is how we will match the patients from the clinical table to the treatment table. We will extract all *Stage IV* patients, then find out what systemic treatment they received first.
 
 ```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = false}
 #first we will check what stages are in the HUICC column
@@ -267,12 +267,34 @@ mean(patients[patients$HUICC == "IV", "DIAALTER"])
 #we can use aggregate
 aggregate(DIAALTER ~ HUICC, data = patients, mean, na.rm = TRUE)
 ```
+
 Quite often for clinical papers, we will need a table to summarize all the clinical characteristics of the patient cohort. It is quite tedious to go through each column to count how many exist in each group. So we will use a library called `tableone` to help us
 
 ```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = false}
 library(tableone)
 
+#we don't need to summarize all the columns in the table so we will include the ones we are interested in
+CreateTableOne(vars = c("SEX", "DIAICD10", "HIST", "HUICC"), data = patients)
 
+#we can see the HIST column was evaluated as an actual number and not a categorical variable
+CreateTableOne(vars = c("SEX", "DIAICD10", "HIST", "HUICC"), data = patients, factorVars = "HIST")
+
+#we can also stratify this table with a specific column, so for instance Sex
+CreateTableOne(vars = c("SEX", "DIAICD10",  "HUICC"), data = patients, factorVars = "HIST", strata = "SEX")
+
+```
+
+# Some clinical learning
+The DIAICD10 column is the International Classification of Diseases coding [ICD10](http://www.who.int/classifications/icd/en/) from the WHO
+In our table we are only interested in the melanomas which are class C43
+The HIST column is the International Classification of Diseases for Oncology coding [ICD-O-3](http://codes.iarc.fr/) The 87xx series will identify the subtype of melanoma
+
+#Some exercises
+We would like to create a summary table for all melanomas (C43) sorted by subtype: Superficial spreading, nodular, lentigo maligna, and malignant melanoma NOS (not otherwise specified). We want to know the average age, male and female distribution, and average breslow depth if available.
+
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = false}
+
+```
 
 # Cheat sheets
 
