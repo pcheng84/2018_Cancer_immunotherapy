@@ -225,18 +225,36 @@ Now that we have the table as a `data.frame` we can access all the data by rows 
 #to look at the first row of the data frame
 patients[1,]
 
+patients %>%
+  slice(1)
+
 #to look at the first column of the data frame
 patients[, 1]
 
+patients %>%
+  select(1)
+
 #to get the data from the second row third column of the data frame
 patients[2,3]
+
+patients %>%
+  slice(2) %>%
+  select(3)
 
 #a nice convenience with the data frame is we can use the column names to subset instead of a number
 #we can use the colnames() function to get the column names of the data frame
 colnames(patients)
 
 patients[, "PAT_ID"]
+
+patients %>%
+  select(PAT_ID)
+
+
 patients[, c("PAT_ID", "HUICC")]
+
+patients %>%
+  select(PAT_ID, HUICC)
 
 #we can also access the column using "$"
 patients$PAT_ID
@@ -260,12 +278,25 @@ patients$HUICC == "IV"
 #this will return a TRUE/FALSE vector which we can use to subset the patient table
 patients[patients$HUICC == "IV",]
 
+patients %>%
+  filter(HUICC == "IV")
+
+
 #we can now get the mean age of stage IV patients with the DIAALTER
 mean(patients[patients$HUICC == "IV", "DIAALTER"])
+
+patients %>%
+  filter(HUICC == "IV") %>%
+  summarise(mean.age = mean(DIAALTER))
+  
 
 #how about getting the mean age for all stages from the HUICC column?
 #we can use aggregate
 aggregate(DIAALTER ~ HUICC, data = patients, mean, na.rm = TRUE)
+
+patients %>%
+  group_by(HUICC) %>%
+  summarise(mean.age = mean(DIAALTER))
 ```
 
 Quite often for clinical papers, we will need a table to summarize all the clinical characteristics of the patient cohort. It is quite tedious to go through each column to count how many exist in each group. So we will use a library called `tableone` to help us
@@ -306,6 +337,10 @@ The function `merge()` will allow us to combine two tables based on a single com
 #This shows how many duplicates there are in the treatment table
 table(duplicated(treatment$PAT_ID))
 
+treatment %>%
+  filter(!duplicated(PAT_ID)) %>%
+  summarise(nb.duplicated=n())
+
 #since we don't know how the dates of the treatment are sorted we will sort from earliest to latest
 #we will convert the BEGINN column with as.Date() to a Date class for sorting
 
@@ -323,10 +358,19 @@ table(duplicated(treatment.order$PAT_ID))
 treatment2 <- treatment.order[!duplicated(treatment$PAT_ID),]
 table(duplicated(treatment2$PAT_ID))
 
+treatment3 <- treatment %>%
+  mutate(Date_start=dmy(treatment$BEGINN))%>%
+  arrange(Date_start) %>%
+  filter(!duplicated(PAT_ID))
+
 #now that our treatment table just has one treatment per patient, we can merge it to the patient table
 pt <- merge(patients, treatment2, by = "PAT_ID", all.x = TRUE)
 
 pt4 <- pt[pt$HUICC == "IV", ]
+
+pt1 <- treatment2 %>%
+  left_join(patients, treatment2, by="PAT_ID") %>%
+  filter(HUICC == "IV")
 
 #we can see the number of treatments in the PRO_BEZ column
 table(pt4$PRO_BEZ)
