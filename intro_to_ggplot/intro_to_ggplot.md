@@ -13,7 +13,6 @@ incremental:true
 - Sophisticated graphics can be created very quickly, allowing fluent investigation of data.
 - With "themes", the appearance of graphs can be tweaked and perfected for publication.
 
-- ![nice_example](img/tm-final-map-1.png)
 
 
 
@@ -78,7 +77,9 @@ incremental:true
 - Two FACS analyses were performed ("test"): Mitosox measures the amount of superoxides in the mitochondria, while DCF-DA measures the superoxides in the cytosol. 
 - The production of superoxides in those cellular compartments is indicated by fluorescence values ("fluo")
 
-- We want to know if the new drug (STO) increases productions of superoxides, if this production differes between cellular compartment, and whether the change (if any) depends on whether the cells are resistant to the MEK inhibitor. Finally, to confirm that the fluorescence is really produced by the the drug, we check if the increase is reversed by the addition of an antioxidant (NAC)
+1. Data
+==================================
+We want to know if the new drug (STO) increases productions of superoxides, if this production differes between cellular compartment, and whether the change (if any) depends on whether the cells are resistant to the MEK inhibitor. Finally, to confirm that the fluorescence is really produced by the the drug, we check if the increase is reversed by the addition of an antioxidant (NAC)
 
 2. Aesthetic mapping
 ========================================================
@@ -138,8 +139,6 @@ ggplot(data, aes(x = cell, y = fluo)) +
   geom_point()
 ```
 
-![plot of chunk geom](intro_to_ggplot-figure/geom-1.png)
-
 ***
 
 Aesthetic mappings specified in the first ggplot command are *global*. Geoms will attempt to use these mappings unless overridden. 
@@ -159,7 +158,7 @@ incremental:true
 
 Exercise 1
 ========================================================
-type:section
+type:prompt
 incremental:true
 Working with aesthetic mapping
 
@@ -167,6 +166,12 @@ Working with aesthetic mapping
 - *Data* is mapped to *aesthetics*. These create a default *coordinate system*. 
 - A *geometric object* is projected on to the coordinate system. The visual properties of this *geom* are determined by the *aesthetic mapping*. 
 
+
+Exercise 1
+========================================================
+type:prompt
+incremental:true
+Working with aesthetic mapping
 Using geom_point(), choose aesthetic mappings of the data to answer these questions:
 -
 
@@ -195,6 +200,12 @@ ggplot(data, aes(x = cell,  y = fluo, color = res)) +
 ggplot(data, aes(x = cell, y = treatment, size = fluo)) +
   geom_point()
 ```
+
+Exercise 1
+========================================================
+type:subsection
+incremental:true
+Working with aesthetic mapping
 
 - Which treatment had overall highest superoxides? 
 
@@ -273,6 +284,8 @@ ggplot(data, aes(x = cell, y = fluo)) +
   geom_bin2d()
 ```
 
+Create a graph using a geom that applies a stat, but replace the stat with another.
+
 
 ```r
 ggplot(data, aes(x = treatment, y = fluo)) +
@@ -304,6 +317,12 @@ ggplot(data, aes(x = treatment, y = fluo, fill = cell)) +
 Try dodge, fill, and stack on the barplot above.
 ---
 
+A note on position adjustments
+========================================================
+type:alert
+incremental:true
+Data points often overlap. They can be separated 4 ways. 
+
 Try position adjustments to clarify this plot:
 ---
 
@@ -328,6 +347,11 @@ ggplot(data, aes(x = fluo)) +
 ```
 - Here, "fluo" is mapped to X using the *scale 1:1*.
 
+
+5. Scales
+========================================================
+incremental:true
+type:prompt
 
 
 ```r
@@ -366,7 +390,10 @@ ggplot(data, aes(x = treatment, y = cell, size = fluo, color = res)) +
   geom_point() +
   scale_color_brewer(type = "qual", palette = 3)
 ```
-
+5. Scales
+========================================================
+incremental:true
+type:prompt
 Another example:
 
 ```r
@@ -414,6 +441,11 @@ ggplot(data, aes(x = cell, fill = treatment, y = fluo)) +
   geom_bar(stat = "identity") 
 ```
 
+
+Exercise 3
+========================================================
+incremental:true
+type:subsection
 Using scale commands, make it look like this: 
 
 ![plot of chunk scales9](intro_to_ggplot-figure/scales9-1.png)
@@ -473,6 +505,12 @@ ggplot(data, aes(x = cell, y = fluo)) +
   facet_grid(~ test)
 ```
 
+7. Facets
+========================================================
+incremental:true
+type:prompt
+Facets split the data before plotting.
+
 - Notice the general form of a facet command: row varaible ~ column variable.
 
 
@@ -494,6 +532,14 @@ Facets split the data before plotting.
 Exercise: create a plot that explicitly specifies each of the italic words above, as well as a position adjustment. 
 ---
 
+7. Facets
+========================================================
+incremental:true
+type:prompt
+Facets split the data before plotting.
+
+Exercise: create a plot that explicitly specifies each of the italic words above, as well as a position adjustment. 
+---
 
 ```r
 ggplot(data, aes(x = treatment, y = fluo, fill = cell)) +
