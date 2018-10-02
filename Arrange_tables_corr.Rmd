@@ -1,0 +1,267 @@
+---
+title: "Arrange Tables"
+author: "Sabrina Hogan"
+date: "`r doc_date()`"
+output: BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{Intro to R}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Real life situation
+I recently got asked to create a cohort of patients and collect samples from the biobank.  
+
+Here are the selection criteria:  
+
+- FFPE blocks
+- in a window of 90days prior or after treatment initiation
+- treatment of interest : immunotherapies
+
+
+I had access to 2 tables different tables:  
+
+- one containing the treatment information for some patients of interest
+- one containing the sample information for all the patients of dermatology
+
+
+# Explore the datasets
+
+## Start your script
+```{r, message = FALSE, warning = FALSE, echo = TRUE, eval = TRUE}
+rm(list=ls())
+
+library(tidyverse)
+library(lubridate)
+```
+
+
+## Import the datasets
+
+```{r, message = FALSE, warning = FALSE, echo = TRUE , eval = TRUE}
+samples <- read.delim("/data/Sabrina/2018_Cancer_immunotherapy/data/Sabrina_all_samples.txt", comment.char="#", na.strings = c("NA"," ",""))
+
+treatments <- read.delim("/data/Sabrina/2018_Cancer_immunotherapy/data/Sabrina_treatments_table.txt", comment.char="#", na.strings = c("NA"," ",""))
+
+tbl_df(samples)
+tbl_df(treatments)
+```
+```{r, message = FALSE, warning = FALSE, echo = TRUE , eval = FALSE}
+
+str(samples)
+str(treatments)
+
+```
+
+
+## Rename
+Some columns have weird names. Let's change this.  
+Rename as follow:
+
+- DBDEINDAT --> sampling.date
+- DBCDIAGNOSE  --> diagnostic1
+- DiagnoseExtractedFromDBBBLOB --> diagnostic2
+
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+# rename some columns
+samples <- samples %>%
+  rename(sampling.date=DBDEINDAT)%>%
+  rename(diagnostic1=DBCDIAGNOSE)%>%
+  rename(diagnostic2=DiagnoseExtractedFromDBBBLOB)
+```
+
+# Arrange tables
+
+## treatment table
+
+The treatment table contains information for a lot of different treatments.  
+We need to select for immunotherapies only (aCLTA4, aPD1, aCTLA4_aPD1)
+
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+treatments.immuno <- treatments%>%
+  filter(treatment== "aCTLA4" | treatment=="aPD1" | treatment=="aCTLA4_aPD1")
+
+```
+
+you should have:  
+
+111 aCTLA4  
+71 aCTLA4_aPD1  
+195 aPD1   
+
+you can use `table()` to explore the treatment colum.  
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+table(treatments.immuno$treatment)
+```
+
+*note: all the levels are still there even if we do not have any samples for those therapy anymore. It can sometimes also clutter your plot legend. This is how you would relevel the treatment column:*
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+treatments.immuno$treatment <- droplevels(treatments.immuno$treatment)
+```
+
+There are only 107 aCTLA4 !  
+If you check again the "treatments" table you will see that actually 4 samples have a spelling mistake --> "aCLTA4"
+
+How do you solve this problem?
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+treatments$treatment <- gsub("aCLTA4", "aCTLA4", treatments$treatment)
+table(treatments$treatment)
+```
+Are all the samples labelled properly?
+
+Good. Now we can select our patients again.
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+immuno <- treatments%>%
+  filter(treatment== "aCTLA4" | treatment=="aPD1" | treatment=="aCTLA4_aPD1")
+table(immuno$treatment)
+```
+
+
+## Samples table
+
+The sample table contains some empty rows which are obviously useless.  
+Remove the rows which do not contain any information.
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+samp.no.na <- samples %>%
+  filter(!is.na(sample.kind))
+```
+
+The sample table has multiple colums containing sampleID information.  
+The usual nomenclature for our samples contains information about the type of sample, the year and the sample number, all together.
+
+You need to combine  "sample.kind", "sample.year" and "sample.num" as follow:  
+
+--> H12.345
+
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+# create complete sampleID column
+samp <- samp.no.na %>%
+  mutate(sample.year=substr(sample.year,3,4))%>%                     # only keep 2 last numbers from date
+  unite(sample.k.y, sample.kind, sample.year, sep= "", remove = F)%>%  # merge sample kind with year of sampling, keep cols   
+  unite(sampleID, sample.k.y, sample.num, sep= ".", remove = T)  # merge previous with samp.num, replacing old columns
+
+```
+
+Make sure there is no space between the characters...
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+samp$sampleID <- gsub(" ", "", samp$sampleID) #remove spaces
+```
+
+
+# Select the right samples
+Now that the nomenclature is correct, let's have a look at the different type of samples present.  
+The table contains many sample types (HG=blood, M=mutation analysis etc...).  
+
+Filter out the samples that are not parafin blocks (remove HG, M, Z, G, SP, TU, K)  
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+blocks <- filter(samp, !grepl('HG|M|Z|G|SP|TU|K', sample.kind)) # filter block of interest
+```
+
+# Merge treatment and sample table
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+blocks <- rename(blocks, KISIM=DBCKHPIN)
+
+tb <- left_join(immuno, blocks, by="KISIM")
+```
+
+
+# Select the samples in the correct period
+subset the table in order to only keep the samples that have been collected between 90d before and 90d after treatment start.  
+
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+# use the lubridate function to change class of date columns
+tb <- tb%>%
+  mutate_at(vars(contains("date")), funs(dmy)) 
+
+# calculate the difference of days between sampling date and start/end of treatment
+tb <- tb%>%
+  mutate(days.from.start=sampling.date-start.treatment.date)%>%
+  mutate(days.from.end=sampling.date-date.last.treatment)
+
+tb1 <- filter(tb, days.from.start>-90 & days.from.start<90)
+```
+
+
+# Plot your results
+
+Here I overlayed the `geom_points()` which represent each blocks, with the `geom_segment()` which is the arrow representing the treatment duration and is colored according to treatment. With `geom_text()` I added in blue the number of days from the start of treatment (left from the point) and number of days from the end of the treatment (right from the point) for each block.
+ 
+## First plot
+
+When the plot is too big to be visualised correctly in R or in a markdown file you can save it as pdf and specify the size you want.
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = FALSE}
+pdf("MyPlot.pdf", width = 20, height = 90)
+
+# the commands to create your plot
+
+dev.off() # clear the plots memory
+
+```
+
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE, fig.height=50, fig.width=20}
+ggplot(tb1, aes(x=sampling.date, y=sampleID))+
+  theme_bw()+
+  geom_point()+  # plots the blocks
+  geom_segment(aes(x = start.treatment.date, y = 0, xend = date.last.treatment, yend = 0, color=treatment), arrow = arrow(length=unit(0.15,"cm"), type = "closed"), size=0.7)+   # adds the arrow for the treatments
+  geom_text(aes(label=days.from.start),color="blue", hjust=1.3, vjust=-0.5)+  # adds label left of each point
+  geom_text(aes(label=days.from.end),color="blue", hjust=-0.3, vjust=-0.5)+ # same on the right
+  scale_y_discrete(expand = expand_scale(add = 2))+  # adjust the scale of the plots to see all labels 
+  scale_x_discrete(expand = expand_scale(mult = .5))+
+  theme(axis.title.x=element_blank(),  # removes unwanted labels and ticks on the axes
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())+
+  facet_wrap(~KISIM, scales = "free", ncol=3) # facet by patients, scales ="free" lets R rescale each plots individually
+
+
+# you will get an error saying that R doesn't know how to pick a scale for your "days.from.start" and "days.from.end" column because they are of the class difftime. By default it will apply a continuous scale which is what we want. But if you want to make it really clean you can change the class as numeric.
+tb2 <- tb1 %>%
+  mutate(days.from.start=as.numeric(days.from.start))%>%
+  mutate(days.from.end=as.numeric(days.from.end))
+```
+
+what is wrong in the plot?  
+
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+# some patients have twice the same block with slightly different sampling date.
+# we know it is actually the same block so we can remove duplicated blocks.
+
+tb2 <- tb2[!duplicated(tb1$sampleID), ]  
+```
+
+now that your results look good, save your table.  
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE}
+write.table(tb2, "table_samples_treatments.txt", sep="\t", row.names = F)
+```
+
+## Plot Responders only and add a title containing the number of R and NR in the entire cohort.  
+You can obviously count the number of R and NR manually and add it as a legend.  
+However it is much smarter to write a command that will output the result for you. 
+I used `ggtitle()` to add the title to my plot. In there I use the `paste0()` function, which basically prints anything I want. I start with a piece of text ("Non-Responders =") followed by a function which basically does this:
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = FALSE}
+tb2 %>%
+  select(KISIM, Response) %>%
+  filter(Response=="NR")%>%
+  filter(!duplicated(KISIM))%>%
+  summarise(number.NR=n())
+```
+
+the "\\n" is the symbol to go down one line.  
+
+```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = TRUE, fig.height=15, fig.width=20}
+ggplot(filter(tb2, Response=="R"), aes(x=sampling.date, y=sampleID))+
+  theme_bw()+
+  geom_point()+
+  geom_segment(aes(x = start.treatment.date, y = 0, xend = date.last.treatment, yend = 0, color=treatment), arrow = arrow(length=unit(0.15,"cm"), type = "closed"), size=1.3)+
+  geom_text(aes(label=days.from.start),color="blue", hjust=1.3, vjust=-0.5)+
+  geom_text(aes(label=days.from.end),color="blue", hjust=-0.3, vjust=-0.5)+
+  scale_y_discrete(expand = expand_scale(add = 2))+
+  scale_x_discrete(expand = expand_scale(mult = .5))+
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())+
+  ggtitle(paste0("Non-Responders =", nrow(unique(select(filter(tb2, Response=="NR"), Response, KISIM))),"\n",
+                 "Responders =", nrow(unique(select(filter(tb2,Response=="R"), Response, KISIM)))
+  ))+
+  facet_wrap(~KISIM, scales = "free", ncol=5)
+```
+
