@@ -323,9 +323,7 @@ The HIST column is the International Classification of Diseases for Oncology cod
 We would like to create a summary table for all melanomas (C43) sorted by subtype: Superficial spreading, nodular, lentigo maligna, and malignant melanoma NOS (not otherwise specified). We want to know the average age, male and female distribution, and average breslow depth if available. **hint** you can use `grepl()` capture all C43.X patients
 
 ```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = false}
-pm <- patients[grepl("C43", patients$DIAICD10) & (patients$HIST == 87203 | patients$HIST == 87213 | patients$HIST == 87433 | patients$HIST == 87423 | patients$HIST == 87413), c("DIAALTER", "SEX", "HIST")]
 
-pmtable <- CreateTableOne(c("DIAALTER", "SEX"), data = pm, factorVars = "HIST", strata = "HIST")
 ```
 
 #Merging tables
