@@ -276,7 +276,7 @@ table(patients$HUICC)
 patients$HUICC == "IV"
 
 #this will return a TRUE/FALSE vector which we can use to subset the patient table
-patients[patients$HUICC == "IV",]
+ptiv <- patients[patients$HUICC == "IV",]
 
 patients %>%
   filter(HUICC == "IV")
@@ -289,7 +289,6 @@ patients %>%
   filter(HUICC == "IV") %>%
   summarise(mean.age = mean(DIAALTER))
   
-
 #how about getting the mean age for all stages from the HUICC column?
 #we can use aggregate
 aggregate(DIAALTER ~ HUICC, data = patients, mean, na.rm = TRUE)
@@ -305,7 +304,7 @@ Quite often for clinical papers, we will need a table to summarize all the clini
 library(tableone)
 
 #we don't need to summarize all the columns in the table so we will include the ones we are interested in
-CreateTableOne(vars = c("SEX", "DIAICD10", "HIST", "HUICC"), data = patients)
+CreateTableOne(vars = c("SEX", "DIAICD10", "HIST", "HUICC", "DIAALTER"), data = patients)
 
 #we can see the HIST column was evaluated as an actual number and not a categorical variable
 CreateTableOne(vars = c("SEX", "DIAICD10", "HIST", "HUICC"), data = patients, factorVars = "HIST")
@@ -321,10 +320,12 @@ In our table we are only interested in the melanomas which are class C43
 The HIST column is the International Classification of Diseases for Oncology coding [ICD-O-3](http://codes.iarc.fr/) The 87xx series will identify the subtype of melanoma
 
 #Some exercises
-We would like to create a summary table for all melanomas (C43) sorted by subtype: Superficial spreading, nodular, lentigo maligna, and malignant melanoma NOS (not otherwise specified). We want to know the average age, male and female distribution, and average breslow depth if available. **hint** you can use `grep()` capture all C43.X patients
+We would like to create a summary table for all melanomas (C43) sorted by subtype: Superficial spreading, nodular, lentigo maligna, and malignant melanoma NOS (not otherwise specified). We want to know the average age, male and female distribution, and average breslow depth if available. **hint** you can use `grepl()` capture all C43.X patients
 
 ```{r, message = TRUE, warning = FALSE, echo = TRUE, eval = false}
+pm <- patients[grepl("C43", patients$DIAICD10) & (patients$HIST == 87203 | patients$HIST == 87213 | patients$HIST == 87433 | patients$HIST == 87423 | patients$HIST == 87413), c("DIAALTER", "SEX", "HIST")]
 
+pmtable <- CreateTableOne(c("DIAALTER", "SEX"), data = pm, factorVars = "HIST", strata = "HIST")
 ```
 
 #Merging tables
@@ -338,7 +339,7 @@ The function `merge()` will allow us to combine two tables based on a single com
 table(duplicated(treatment$PAT_ID))
 
 treatment %>%
-  filter(!duplicated(PAT_ID)) %>%
+  filter(duplicated(PAT_ID)) %>%
   summarise(nb.duplicated=n())
 
 #since we don't know how the dates of the treatment are sorted we will sort from earliest to latest
@@ -355,7 +356,7 @@ treatment.order <- treatment[order(treatment$Date_start),]
 table(duplicated(treatment.order$PAT_ID))
 
 #now we will remove all the duplicates
-treatment2 <- treatment.order[!duplicated(treatment$PAT_ID),]
+treatment2 <- treatment.order[!duplicated(treatment.order$PAT_ID),]
 table(duplicated(treatment2$PAT_ID))
 
 treatment3 <- treatment %>%
@@ -378,6 +379,7 @@ table(pt4$PRO_BEZ)
 
 #Exercise
 Create a summary table with the Stage IV melanoma patients for Sex, Age, and Treatment
+
 # Cheat sheets
 
 - dplyr [(download pdf)](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
